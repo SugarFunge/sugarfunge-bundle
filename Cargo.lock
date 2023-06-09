@@ -1603,6 +1603,7 @@ name = "pallet-balances"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.42#569aae5341ea0c1d10426fa1ec13a36c0b64393b"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "log",
