@@ -218,43 +218,43 @@ impl<T: Config> Pallet<T> {
         schema: &BundleSchema<T>,
         metadata: BundleMetadataOf<T>,
     ) -> DispatchResult {
-        ensure!(
-            BlakeTwo256::hash_of(&schema) == bundle_id,
-            Error::<T>::InvalidBundleIdForBundle
-        );
+        // ensure!(
+        //     BlakeTwo256::hash_of(&schema) == bundle_id,
+        //     Error::<T>::InvalidBundleIdForBundle
+        // );
 
-        let bundle_id: BundleId = BlakeTwo256::hash_of(&schema);
+        // let bundle_id: BundleId = BlakeTwo256::hash_of(&schema);
 
-        ensure!(
-            !Bundles::<T>::contains_key(bundle_id),
-            Error::<T>::BundleExists
-        );
+        // ensure!(
+        //     !Bundles::<T>::contains_key(bundle_id),
+        //     Error::<T>::BundleExists
+        // );
 
-        let operator = <T as Config>::PalletId::get().into_account_truncating();
+        // let operator = <T as Config>::PalletId::get().into_account_truncating();
 
-        sugarfunge_asset::Pallet::<T>::do_create_class(
-            &who,
-            &operator,
-            class_id,
-            metadata.clone(),
-        )?;
+        // sugarfunge_asset::Pallet::<T>::do_create_class(
+        //     &who,
+        //     &operator,
+        //     class_id,
+        //     metadata.clone(),
+        // )?;
 
-        let vault: T::AccountId =
-            <T as Config>::PalletId::get().into_sub_account_truncating(bundle_id);
+        // let vault: T::AccountId =
+        //     <T as Config>::PalletId::get().into_sub_account_truncating(bundle_id);
 
-        Bundles::<T>::insert(
-            &bundle_id,
-            &BundleOf::<T> {
-                creator: who.clone(),
-                class_id,
-                asset_id,
-                schema: schema.clone(),
-                metadata,
-                vault,
-            },
-        );
+        // Bundles::<T>::insert(
+        //     &bundle_id,
+        //     &BundleOf::<T> {
+        //         creator: who.clone(),
+        //         class_id,
+        //         asset_id,
+        //         schema: schema.clone(),
+        //         metadata,
+        //         vault,
+        //     },
+        // );
 
-        AssetBundles::<T>::insert((class_id, asset_id), bundle_id);
+        // AssetBundles::<T>::insert((class_id, asset_id), bundle_id);
 
         Self::deposit_event(Event::Register {
             bundle_id,
