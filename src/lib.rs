@@ -234,7 +234,7 @@ impl<T: Config> Pallet<T> {
         let operator = <T as Config>::PalletId::get().into_account_truncating();
 
         ensure!(
-            sugarfunge_asset::Pallet::<T>::asset_exists(class_id, asset_id),
+            !sugarfunge_asset::Pallet::<T>::asset_exists(class_id, asset_id),
             Error::<T>::AssetExists
         );
 
