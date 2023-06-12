@@ -135,6 +135,7 @@ pub mod pallet {
         InvalidArrayLength,
         /// Insufficient asset balance
         InsufficientBalance,
+        AssetExists,
     }
 
     // Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -218,43 +219,50 @@ impl<T: Config> Pallet<T> {
         schema: &BundleSchema<T>,
         metadata: BundleMetadataOf<T>,
     ) -> DispatchResult {
-        // ensure!(
-        //     BlakeTwo256::hash_of(&schema) == bundle_id,
-        //     Error::<T>::InvalidBundleIdForBundle
-        // );
+        ensure!(
+            BlakeTwo256::hash_of(&schema) == bundle_id,
+            Error::<T>::InvalidBundleIdForBundle
+        );
 
-        // let bundle_id: BundleId = BlakeTwo256::hash_of(&schema);
+        let bundle_id: BundleId = BlakeTwo256::hash_of(&schema);
 
-        // ensure!(
-        //     !Bundles::<T>::contains_key(bundle_id),
-        //     Error::<T>::BundleExists
-        // );
+        ensure!(
+            !Bundles::<T>::contains_key(bundle_id),
+            Error::<T>::BundleExists
+        );
 
-        // let operator = <T as Config>::PalletId::get().into_account_truncating();
+        let operator = <T as Config>::PalletId::get().into_account_truncating();
 
-        // sugarfunge_asset::Pallet::<T>::do_create_class(
-        //     &who,
-        //     &operator,
-        //     class_id,
-        //     metadata.clone(),
-        // )?;
+        ensure!(
+            sugarfunge_asset::Pallet::<T>::asset_exists(class_id, asset_id),
+            Error::<T>::AssetExists
+        );
 
-        // let vault: T::AccountId =
-        //     <T as Config>::PalletId::get().into_sub_account_truncating(bundle_id);
+        if !sugarfunge_asset::Pallet::<T>::class_exists(class_id) {
+            sugarfunge_asset::Pallet::<T>::do_create_class(
+                &who,
+                &operator,
+                class_id,
+                metadata.clone(),
+            )?;
+        }
 
-        // Bundles::<T>::insert(
-        //     &bundle_id,
-        //     &BundleOf::<T> {
-        //         creator: who.clone(),
-        //         class_id,
-        //         asset_id,
-        //         schema: schema.clone(),
-        //         metadata,
-        //         vault,
-        //     },
-        // );
+        let vault: T::AccountId =
+            <T as Config>::PalletId::get().into_sub_account_truncating(bundle_id);
 
-        // AssetBundles::<T>::insert((class_id, asset_id), bundle_id);
+        Bundles::<T>::insert(
+            &bundle_id,
+            &BundleOf::<T> {
+                creator: who.clone(),
+                class_id,
+                asset_id,
+                schema: schema.clone(),
+                metadata,
+                vault,
+            },
+        );
+
+        AssetBundles::<T>::insert((class_id, asset_id), bundle_id);
 
         Self::deposit_event(Event::Register {
             bundle_id,
