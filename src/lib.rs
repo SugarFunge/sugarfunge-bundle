@@ -239,11 +239,6 @@ impl<T: Config> Pallet<T> {
             Error::<T>::AssetExists
         );
 
-        ensure!(
-            sugarfunge_asset::Pallet::<T>::account_is_owner(who, class_id),
-            Error::<T>::AccountNotOwner
-        );
-
         let operator = <T as Config>::PalletId::get().into_account_truncating();
 
         if !sugarfunge_asset::Pallet::<T>::class_exists(class_id) {
@@ -254,6 +249,11 @@ impl<T: Config> Pallet<T> {
                 metadata.clone(),
             )?;
         }
+
+        ensure!(
+            sugarfunge_asset::Pallet::<T>::account_is_owner(who, class_id),
+            Error::<T>::AccountNotOwner
+        );
 
         let vault: T::AccountId =
             <T as Config>::PalletId::get().into_sub_account_truncating(bundle_id);
