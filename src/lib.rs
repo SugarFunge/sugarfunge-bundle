@@ -239,14 +239,14 @@ impl<T: Config> Pallet<T> {
             Error::<T>::AssetExists
         );
 
-        ensure!(
-            sugarfunge_asset::Pallet::<T>::account_is_owner(who, class_id),
-            Error::<T>::AccountNotOwner
-        );
-
         let operator = <T as Config>::PalletId::get().into_account_truncating();
 
-        if !sugarfunge_asset::Pallet::<T>::class_exists(class_id) {
+        if sugarfunge_asset::Pallet::<T>::class_exists(class_id) {
+            ensure!(
+                sugarfunge_asset::Pallet::<T>::account_is_owner(who, class_id),
+                Error::<T>::AccountNotOwner
+            );
+        } else {
             sugarfunge_asset::Pallet::<T>::do_create_class(
                 &who,
                 &operator,
