@@ -135,7 +135,10 @@ pub mod pallet {
         InvalidArrayLength,
         /// Insufficient asset balance
         InsufficientBalance,
+        // There already exists an asset with this value
         AssetExists,
+        // The account given is not the owner of the class_id
+        AccountNotOwner,
     }
 
     // Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -231,12 +234,17 @@ impl<T: Config> Pallet<T> {
             Error::<T>::BundleExists
         );
 
-        let operator = <T as Config>::PalletId::get().into_account_truncating();
-
         ensure!(
             !sugarfunge_asset::Pallet::<T>::asset_exists(class_id, asset_id),
             Error::<T>::AssetExists
         );
+
+        ensure!(
+            sugarfunge_asset::Pallet::<T>::account_is_owner(who, class_id),
+            Error::<T>::AccountNotOwner
+        );
+
+        let operator = <T as Config>::PalletId::get().into_account_truncating();
 
         if !sugarfunge_asset::Pallet::<T>::class_exists(class_id) {
             sugarfunge_asset::Pallet::<T>::do_create_class(
